@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Câu Hỏi</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-dung {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .btn-dung:hover {
+            background-color: #38a169;
+            transform: translateY(-2px);
+        }
+
+        .btn-sai {
+            background-color: #f56565;
+            color: white;
+        }
+
+        .btn-sai:hover {
+            background-color: #48bb78; /* Khi sờ chuột vào sẽ đổi sang màu xanh của Đúng */
+        }
+
+        #result {
+            margin-top: 25px;
+            font-size: 20px;
+            font-weight: bold;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Hmai có bị khùng không?</h1>
+        <div class="btn-container">
+            <button class="btn btn-dung" onclick="chonDung()">Có</button>
+            <button id="btnSai" class="btn btn-sai" onmouseover="doiThanhDung()" onclick="xuLyClickSai()">Không</button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const btnSai = document.getElementById('btnSai');
+        const result = document.getElementById('result');
+        let daDoi = false; // Biến kiểm tra trạng thái nút Sai đã chuyển thành Đúng chưa
+
+        // Khi sờ chuột vào (chỉ chạy trên thiết bị có chuột)
+        function doiThanhDung() {
+            btnSai.innerText = "Có";
+            btnSai.style.backgroundColor = "#48bb78";
+            daDoi = true;
+        }
+
+        // Khi chọn nút Đúng
+        function chonDung() {
+            result.style.color = "#38a169";
+            result.innerText = "Chính xác tuyệt đối! Không thể chối cãi 😎";
+        }
+
+        // Khi bấm vào nút Sai (Dành cho điện thoại / thiết bị không dùng chuột hoặc bấm nhanh)
+        function xuLyClickSai() {
+            // Nếu nút chưa bị đổi chữ thành "Đúng" (nghĩa là trên điện thoại không có sự kiện hover)
+            if (!daDoi) {
+                let xacNhan = confirm("Bạn chắc chắn là Có?");
+                if (xacNhan) {
+                    chonDung();
+                }
+            } else {
+                // Nếu đã sờ chuột qua rồi thì tính là chọn đúng luôn
+                chonDung();
+            }
+        }
+    </script>
+
+</body>
+</html>
