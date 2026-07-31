@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Câu Hỏi</title>
+    <!-- Thư viện pháo hoa canvas-confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -19,6 +21,7 @@
             justify-content: center;
             align-items: center;
             color: #333;
+            overflow: hidden;
         }
 
         .card {
@@ -29,6 +32,7 @@
             text-align: center;
             max-width: 450px;
             width: 90%;
+            z-index: 10;
         }
 
         h1 {
@@ -71,7 +75,7 @@
         }
 
         .btn-sai:hover {
-            background-color: #48bb78; /* Khi sờ chuột vào sẽ đổi sang màu xanh của Đúng */
+            background-color: #48bb78; /* Khi sờ chuột vào sẽ đổi sang màu xanh */
         }
 
         #result {
@@ -96,31 +100,70 @@
     <script>
         const btnSai = document.getElementById('btnSai');
         const result = document.getElementById('result');
-        let daDoi = false; // Biến kiểm tra trạng thái nút Sai đã chuyển thành Đúng chưa
+        let daDoi = false; // Biến kiểm tra trạng thái nút Sai đã chuyển thành Có chưa
 
-        // Khi sờ chuột vào (chỉ chạy trên thiết bị có chuột)
+        // Tạo âm thanh chúc mừng bằng Web Audio API (Không cần link nhạc ngoài, chạy luôn lập tức)
+        function playSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Nốt nhạc vui tươi (Giai điệu chiến thắng ngắn gọn)
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, index) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime + index * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + index * 0.1 + 0.3);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start(audioCtx.currentTime + index * 0.1);
+                    osc.stop(audioCtx.currentTime + index * 0.1 + 0.3);
+                });
+            } catch (e) {
+                console.log("Trình duyệt chặn âm thanh tự động");
+            }
+        }
+
+        // Hiệu ứng bắn pháo hoa
+        function triggerConfetti() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // Khi sờ chuột vào nút "Không"
         function doiThanhDung() {
             btnSai.innerText = "Có";
             btnSai.style.backgroundColor = "#48bb78";
             daDoi = true;
         }
 
-        // Khi chọn nút Đúng
+        // Khi chọn đáp án đúng
         function chonDung() {
             result.style.color = "#38a169";
-            result.innerText = "Chính xác tuyệt đối! Không thể chối cãi 😎";
+            result.innerText = "Hmai giỏi quá ta!";
+            
+            // Kích hoạt hiệu ứng âm thanh và pháo hoa
+            playSound();
+            triggerConfetti();
         }
 
-        // Khi bấm vào nút Sai (Dành cho điện thoại / thiết bị không dùng chuột hoặc bấm nhanh)
+        // Khi bấm vào nút "Không" (trên điện thoại hoặc bấm nhanh)
         function xuLyClickSai() {
-            // Nếu nút chưa bị đổi chữ thành "Đúng" (nghĩa là trên điện thoại không có sự kiện hover)
             if (!daDoi) {
-                let xacNhan = confirm("Bạn chắc chắn là Có?");
+                let xacNhan = confirm("Chắc là có đúng k?");
                 if (xacNhan) {
                     chonDung();
                 }
             } else {
-                // Nếu đã sờ chuột qua rồi thì tính là chọn đúng luôn
                 chonDung();
             }
         }
